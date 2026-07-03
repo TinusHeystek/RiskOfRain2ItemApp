@@ -1,0 +1,44 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Risk of Rain 2 Item Priority Board</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header>
+    <div class="headerRow">
+      <div>
+        <h1>Risk of Rain 2 Item Priority Board</h1>
+        <div class="sub">
+          Drag items up/down or between columns. Click Save Order to keep your layout in this browser.
+        </div>
+      </div>
+
+      <div class="controls">
+        <input id="search" placeholder="Search item or description" />
+        <select id="rarity">
+          <option value="">All rarities</option>
+        </select>
+        <button id="addColumn">Add Column</button>
+        <button id="save">Save Order</button>
+        <button id="export">Export JSON</button>
+        <button id="importBtn">Import JSON</button>
+        <button id="reset">Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="board" id="board"></div>
+  </main>
+
+  <footer>
+    Data and item descriptions are based on the Risk of Rain 2 Wiki Items page. Icons are loaded from local assets in this project. Local ordering is stored in browser localStorage.
+  </footer>
+
+  <script src="./items.js" defer></script>
+  <script src="./app.js" defer></script>
+</body>
+</html>

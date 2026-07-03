@@ -21,6 +21,10 @@
         <select id="rarity">
           <option value="">All rarities</option>
         </select>
+        <div class="viewToggle">
+          <button id="listViewBtn" class="viewBtn active" title="List View">List View</button>
+          <button id="tierListViewBtn" class="viewBtn" title="Tier List View">Tier List</button>
+        </div>
         <button id="addColumn">Add Column</button>
         <button id="save">Save Order</button>
         <button id="export">Export JSON</button>
@@ -32,6 +36,7 @@
 
   <main>
     <div class="board" id="board"></div>
+    <div class="tierListContainer" id="tierListContainer" style="display: none;"></div>
   </main>
 
   <footer>

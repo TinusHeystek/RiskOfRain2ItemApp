@@ -255,13 +255,13 @@ function createHoverTooltip(item) {
 	tooltip.innerHTML = `<div class="tooltipContent">
 		<div class="tooltipCardMedia">
 			<img class="tooltipIcon ${rarityClass(item.rarity)}" src="${localIconUrl(item.name)}" alt="${item.name} icon" loading="lazy" onerror="this.style.visibility='hidden'"/>
+			<div class="tooltipType" title="${item.type}">${item.type}</div>
 		</div>
 		<div>
 			<div class="tooltipNameRow">
 				<span class="tooltipName">${item.name}</span>
 				<span class="tooltipRarity ${rarityClass(item.rarity)}">${item.rarity}</span>
 			</div>
-			<div class="tooltipType">${item.type}</div>
 			<div class="tooltipDesc">${item.description}</div>
 		</div>
 	</div>`;

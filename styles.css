@@ -41,6 +41,20 @@ header {
 	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
 }
 
+.preloadStatus {
+	font-size: 12px;
+	color: #5eb7e8;
+	padding: 6px 0;
+	text-align: center;
+	min-height: 18px;
+	transition: opacity 0.3s;
+}
+
+.preloadStatus.hidden {
+	opacity: 0;
+	pointer-events: none;
+}
+
 .headerRow {
 	display: flex;
 	gap: 16px;

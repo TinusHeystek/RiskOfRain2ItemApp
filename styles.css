@@ -413,12 +413,14 @@ a {
 	background: linear-gradient(180deg, rgba(17, 25, 42, 0.94), rgba(12, 20, 34, 0.94));
 	border: 1px solid var(--line);
 	border-radius: 14px;
-	padding: 12px;
+	padding: 10px 12px;
 	min-height: 80px;
 }
 
 .tierLabel {
 	min-width: 100px;
+	width: 100px;
+	flex-shrink: 0;
 	font-weight: 700;
 	font-size: 16px;
 	text-align: center;
@@ -426,6 +428,19 @@ a {
 	background: rgba(23, 34, 57, 0.98);
 	border-radius: 10px;
 	border: 1px solid var(--line-soft);
+	cursor: grab;
+	transition: background 0.15s, border-color 0.15s;
+}
+
+.tierLabel:hover {
+	background: rgba(30, 45, 75, 0.98);
+	border-color: #5eb7e8;
+}
+
+.tierRow.rowDragging .tierLabel {
+	opacity: 0.7;
+	outline: 2px dashed #5eb7e8;
+	outline-offset: -4px;
 }
 
 .tierItems {
@@ -442,6 +457,7 @@ a {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	justify-content: center;
 }
 
 .tierIcon.dragging {
@@ -465,17 +481,45 @@ a {
 	box-shadow: 0 8px 16px rgba(5, 10, 20, 0.45);
 }
 
+.tierIconImg.Common {
+	background: #616b7f;
+	border-color: #7a859a;
+}
+
+.tierIconImg.Uncommon {
+	background: #2e5f46;
+	border-color: #3f7d5f;
+}
+
+.tierIconImg.Legendary {
+	background: #6f3c43;
+	border-color: #93535b;
+}
+
+.tierIconImg.Boss {
+	background: #675d2c;
+	border-color: #8a7b3a;
+}
+
+.tierIconImg.Lunar,
+.tierIconImg.LunarEquipment {
+	background: #305074;
+	border-color: #44709d;
+}
+
+.tierIconImg.Void {
+	background: #563f72;
+	border-color: #74559a;
+}
+
+.tierIconImg.Equipment,
+.tierIconImg.EliteEquipment {
+	background: #6a4b2e;
+	border-color: #8b653f;
+}
+
 .tierIconMeta {
-	margin-top: 4px;
-	width: 54px;
-	line-height: 1.2;
-	border-radius: 5px;
-	white-space: nowrap;
-	overflow: hidden;
-	color: #7f92b8;
-	font-size: 10px;
-	font-weight: 400;
-	text-align: center;
+	display: none;
 }
 
 .hoverTooltip {

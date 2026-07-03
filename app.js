@@ -304,20 +304,31 @@ function renderTierList() {
 			tierIcon.draggable = true;
 			tierIcon.dataset.name = item.name;
 			
-			tierIcon.innerHTML = `<img class="tierIconImg ${rarityClass(item.rarity)}" src="${localIconUrl(item.name)}" alt="${item.name} icon" loading="lazy" onerror="this.style.visibility='hidden'"/><div class="tierIconMeta" title="${item.type}">${item.type}</div>`;
+			const img = document.createElement('img');
+			img.className = `tierIconImg ${rarityClass(item.rarity)}`;
+			img.src = localIconUrl(item.name);
+			img.alt = `${item.name} icon`;
+			img.loading = 'lazy';
+			img.onerror = function() { this.style.visibility = 'hidden'; };
+			
+			tierIcon.appendChild(img);
 			
 			const tooltip = createHoverTooltip(item);
 			
 			tierIcon.addEventListener('mouseenter', (event) => {
 				tooltip.classList.remove('hidden');
-				updateTooltipPosition(tooltip, event.target);
+				updateTooltipPosition(tooltip, img);
 			});
 			
 			tierIcon.addEventListener('mousemove', (event) => {
-				updateTooltipPosition(tooltip, event.target);
+				updateTooltipPosition(tooltip, img);
 			});
 			
 			tierIcon.addEventListener('mouseleave', () => {
+				tooltip.classList.add('hidden');
+			});
+			
+			tierIcon.addEventListener('dragstart', () => {
 				tooltip.classList.add('hidden');
 			});
 			
@@ -378,7 +389,7 @@ function setupTierListDnd() {
 			event.preventDefault();
 			zone.classList.add('dropHint');
 			
-			const after = getAfterTierList(zone, event.clientX);
+			const after = getAfterTierList(zone, event.clientX, event.clientY);
 			const dragging = document.querySelector('.tierIcon.dragging');
 			if (!dragging) {
 				return;
@@ -398,23 +409,91 @@ function setupTierListDnd() {
 			recompute();
 		});
 	});
+	
+	setupTierListRowReorder();
 }
 
-function getAfterTierList(zone, x) {
+function setupTierListRowReorder() {
+	let draggedRow = null;
+	
+	document.querySelectorAll('.tierRow').forEach((rowEl) => {
+		const label = rowEl.querySelector('.tierLabel');
+		if (!label) {
+			return;
+		}
+		
+		label.draggable = true;
+		
+		label.addEventListener('dragstart', (event) => {
+			draggedRow = rowEl;
+			rowEl.classList.add('rowDragging');
+			event.dataTransfer.effectAllowed = 'move';
+			event.dataTransfer.setData('text/plain', rowEl.dataset.category);
+		});
+		
+		label.addEventListener('dragend', () => {
+			if (draggedRow) {
+				draggedRow.classList.remove('rowDragging');
+				draggedRow = null;
+				persistRowOrderFromDom();
+			}
+		});
+		
+		rowEl.addEventListener('dragover', (event) => {
+			if (!draggedRow || draggedRow === rowEl) {
+				return;
+			}
+			
+			event.preventDefault();
+			const box = rowEl.getBoundingClientRect();
+			const beforeTarget = event.clientY < box.top + box.height / 2;
+			
+			const container = tierListContainer;
+			if (beforeTarget) {
+				container.insertBefore(draggedRow, rowEl);
+			} else {
+				container.insertBefore(draggedRow, rowEl.nextSibling);
+			}
+		});
+	});
+}
+
+function persistRowOrderFromDom() {
+	const ordered = [...tierListContainer.querySelectorAll('.tierRow')].map((row) => row.dataset.category);
+	if (ordered.length === columns.length && ordered.length > 0) {
+		columns = ordered;
+		persistState();
+	}
+}
+
+function getAfterTierList(zone, x, y) {
 	const elements = [...zone.querySelectorAll('.tierIcon:not(.dragging)')];
 	
+	// For multi-line layouts, find the closest element considering both X and Y
 	return elements.reduce(
 		(closest, child) => {
 			const box = child.getBoundingClientRect();
-			const offset = x - box.left - box.width / 2;
+			const centerY = box.top + box.height / 2;
+			const centerX = box.left + box.width / 2;
 			
-			if (offset < 0 && offset > closest.offset) {
-				return { offset, element: child };
+			// Distance in 2D space
+			const distY = Math.abs(y - centerY);
+			const distX = Math.abs(x - centerX);
+			
+			// Prioritize same-line items (close Y), then find left-most from that line
+			const isAbove = y < centerY;
+			const isSameLine = distY < box.height;
+			
+			if (isSameLine && isAbove && x < centerX) {
+				const distance = distX + distY;
+				if (distance < closest.distance) {
+					return { distance, element: child };
+				}
 			}
 			
 			return closest;
 		},
-		{ offset: Number.NEGATIVE_INFINITY }
+		{ distance: Number.POSITIVE_INFINITY }
 	).element;
 }
 

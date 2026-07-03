@@ -24,7 +24,7 @@ function localIconUrl(name) {
 }
 
 function preloadImage(name) {
-	// Return cached blob URL if already preloaded
+	// Return cached URL if already preloaded
 	if (imageBlobUrlCache.has(name)) {
 		return Promise.resolve(imageBlobUrlCache.get(name));
 	}
@@ -34,41 +34,22 @@ function preloadImage(name) {
 		return imageLoadPromises.get(name);
 	}
 
-	// Create new loading promise that returns blob URL
+	// Create new loading promise
 	const promise = new Promise((resolve) => {
 		const img = new Image();
-		img.crossOrigin = 'anonymous';
-		img.src = localIconUrl(name);
+		const iconUrl = localIconUrl(name);
+		img.src = iconUrl;
 		
 		img.onload = () => {
-			// Convert image to canvas to blob URL to eliminate network requests
-			const canvas = document.createElement('canvas');
-			canvas.width = img.naturalWidth || 54;
-			canvas.height = img.naturalHeight || 54;
-			const ctx = canvas.getContext('2d');
-			ctx.drawImage(img, 0, 0);
-			
-			canvas.toBlob(blob => {
-				const blobUrl = URL.createObjectURL(blob);
-				imageBlobUrlCache.set(name, blobUrl);
-				resolve(blobUrl);
-			});
+			// Cache the URL directly - browser cache prevents re-downloads
+			imageBlobUrlCache.set(name, iconUrl);
+			resolve(iconUrl);
 		};
 		
 		img.onerror = () => {
-			// On error, create a placeholder blob URL
-			const canvas = document.createElement('canvas');
-			canvas.width = 54;
-			canvas.height = 54;
-			const ctx = canvas.getContext('2d');
-			ctx.fillStyle = '#222';
-			ctx.fillRect(0, 0, 54, 54);
-			
-			canvas.toBlob(blob => {
-				const blobUrl = URL.createObjectURL(blob);
-				imageBlobUrlCache.set(name, blobUrl);
-				resolve(blobUrl);
-			});
+			// On error, still cache the URL to avoid repeated attempts
+			imageBlobUrlCache.set(name, iconUrl);
+			resolve(iconUrl);
 		};
 	});
 
